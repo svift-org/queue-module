@@ -6,6 +6,8 @@
 
 'use strict';
 
+var render = require('svift-render')
+
 var queue_child = (function () {
  
   var module = {},

@@ -17,6 +17,7 @@
     "child_process": "^1.0.2",
     "os": "^0.1.1",
     "sqlite3": "^3.1.8",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "svift-render": "git+ssh://git@bitbucket.org:svift/render-module.git"
   }
 }
