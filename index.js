@@ -90,7 +90,9 @@ var queue = (function () {
       console.log(err.message)
     }
 
-    db.all("SELECT job_id FROM svift_queue WHERE id = ?", [this.lastID], function(err, rows){
+    let lastID = this.lastID
+
+    db.all("SELECT job_id FROM svift_queue WHERE id = ?", [lastID], function(err, rows){
       if(err){
         console.log(err.message)
       }

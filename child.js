@@ -21,16 +21,16 @@ var queue_child = (function () {
   module.init = function (pid) {
     id = pid
 
-    //init render-module
-
-    process.send({func:'initDone', params:{
-      child_id: id
-    }})
+    render.init(function(){
+      process.send({func:'initDone', params:{
+        child_id: id
+      }})  
+    })
   }
 
   module.start = function (params) {
     job_id = params.id
-    setTimeout(module.done, 3000)
+    render.render(params, module.done);
   }
 
   module.done = function () {
