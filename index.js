@@ -14,7 +14,7 @@ var uuid = require('uuid/v1'),
 var queue = (function () {
  
   var module = {},
-  	db, children = [], childState = []
+  	db, children = [], childState = [], rootDir = null
 
   /**
   * Initiate the queue module, by providing an sqlite instance, afterwards a job table is initialised, which will hande the jobs
@@ -22,7 +22,8 @@ var queue = (function () {
   * @param {Object} `mysqlite` sqlite3 db object
   */
 
-  module.init = function ( mysqlite, callback ) {
+  module.init = function ( mysqlite, dir, callback ) {
+    rootDir = dir
   	db = mysqlite
 
     //Create job table if not already exists
@@ -35,7 +36,7 @@ var queue = (function () {
       for(let i = 0; i<cp_limit && i<numCPUs; i++){
         children.push(cp.fork(__dirname + '/child'))
         childState.push(-1)
-        children[i].send({func:'init', params:i})
+        children[i].send({func:'init', params:{id:i, dir:rootDir}})
         children[i].on('message', function(m) {
           module[m.func](m.params)
         })
