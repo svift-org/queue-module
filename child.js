@@ -12,16 +12,18 @@ var queue_child = (function () {
  
   var module = {},
     id = null,
-    job_id = null
+    job_id = null,
+    rootDir = null
 
   process.on('message', function(m) {
     module[m.func](m.params)
   });
 
-  module.init = function (pid) {
-    id = pid
+  module.init = function (obj) {
+    id = obj.id
+    rootDir = obj.dir
 
-    render.init(function(){
+    render.init(rootDir, function(){
       process.send({func:'initDone', params:{
         child_id: id
       }})  
