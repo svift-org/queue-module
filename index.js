@@ -37,7 +37,6 @@ var queue = (function () {
         childState.push(-1)
         children[i].send({func:'init', params:i})
         children[i].on('message', function(m) {
-          console.log(m)
           module[m.func](m.params)
         })
       }
@@ -107,7 +106,6 @@ var queue = (function () {
   }
 
   module.jobDone = function (params) {
-    console.log('jobDone')
     db.run("UPDATE svift_queue SET status = 2, end = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [params.job_id], function (err) {
       if (err) {
         console.log(err.message)
