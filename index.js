@@ -68,6 +68,7 @@ var queue = (function () {
                 console.log(err.message)
               }
             })
+            console.log(rows[ri].params)
             child.send({func:'start',params:{id:rows[ri].job_id, params:rows[ri].params}})
             ri++
             if(ri >= rows.length){

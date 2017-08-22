@@ -30,6 +30,7 @@ var queue_child = (function () {
 
   module.start = function (params) {
     job_id = params.id
+    console.log(params)
     render.render(params, module.done);
   }
 
