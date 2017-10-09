@@ -26,7 +26,7 @@ var queue_child = (function () {
     render.init(rootDir, function(){
       process.send({func:'initDone', params:{
         child_id: id
-      }})  
+      }})
     }, module.update)
   }
 
