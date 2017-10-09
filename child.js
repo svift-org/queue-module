@@ -13,7 +13,8 @@ var queue_child = (function () {
   var module = {},
     id = null,
     job_id = null,
-    rootDir = null
+    rootDir = null,
+    module.process = process
 
   process.on('message', function(m) {
     module[m.func](m.params)
@@ -24,7 +25,7 @@ var queue_child = (function () {
     rootDir = obj.dir
 
     render.init(rootDir, function(){
-      process.send({func:'initDone', params:{
+      module.process.send({func:'initDone', params:{
         child_id: id
       }})
     }, module.update)
@@ -36,8 +37,7 @@ var queue_child = (function () {
   }
 
   module.done = function () {
-    console.log('jobDone');
-    process.send({func:'jobDone', params:{
+    module.process.send({func:'jobDone', params:{
       job_id :job_id,
       child_id:id
     }})
@@ -45,12 +45,12 @@ var queue_child = (function () {
 
   module.update = function (type, state) {
     console.log(job_id, id, type, state);
-    /*process.send({func:'jobUpdate', params:{
+    module.process.send({func:'jobUpdate', params:{
       job_id :job_id,
       child_id:id,
       type:type,
       state:state
-    }})*/
+    }})
   }
 
   return module;
