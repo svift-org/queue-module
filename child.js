@@ -13,8 +13,9 @@ var queue_child = (function () {
   var module = {},
     id = null,
     job_id = null,
-    rootDir = null,
-    module.process = process
+    rootDir = null
+  
+  module.process = process
 
   process.on('message', function(m) {
     module[m.func](m.params)
