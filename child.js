@@ -27,7 +27,7 @@ var queue_child = (function () {
       process.send({func:'initDone', params:{
         child_id: id
       }})  
-    })
+    }, module.update)
   }
 
   module.start = function (params) {
@@ -40,6 +40,15 @@ var queue_child = (function () {
       job_id :job_id,
       child_id:id
     }})
+  }
+
+  module.update = function (type, state) {
+    process.send({func:'jobUpdate', params:{
+      job_id :job_id,
+      child_id:id,
+      type:type,
+      state:state
+    }}) 
   }
 
   return module;

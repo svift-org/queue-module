@@ -106,6 +106,10 @@ var queue = (function () {
    })
   }
 
+  module.updateDone = function (params) {
+    module.updateStat(params.job_id, params.type, params.state)
+  }
+
   module.jobDone = function (params) {
     db.run("UPDATE svift_queue SET status = 2, end = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [params.job_id], function (err) {
       if (err) {
