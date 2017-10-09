@@ -44,12 +44,12 @@ var queue_child = (function () {
 
   module.update = function (type, state) {
     console.log(job_id, id, type, state);
-    process.send({func:'jobUpdate', params:{
+    /*process.send({func:'jobUpdate', params:{
       job_id :job_id,
       child_id:id,
       type:type,
       state:state
-    }}) 
+    }})*/
   }
 
   return module;
