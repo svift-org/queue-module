@@ -27,7 +27,7 @@ var queue = (function () {
   	db = mysqlite
 
     //Create job table if not already exists
-    db.run("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
+    db.run("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT, job_id text, status integer, full_status text, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
       if(err){
         //This creates an error if the svift_queue table is created for the first time, no worries about that...
         console.log(err)
@@ -119,11 +119,32 @@ var queue = (function () {
   }
 
   module.jobStat = function (job_id, callback){
-    db.all("SELECT status FROM svift_queue WHERE job_id = ?", [job_id], function(err, rows){
+    db.all("SELECT status, full_status FROM svift_queue WHERE job_id = ?", [job_id], function(err, rows){
       if(rows.length<1){
         callback('job_id not found', null)
       }else{
-        callback(null, rows[0].status)
+        callback(null, {status:rows[0].status, full:rows[0].full_status})
+      }
+    })
+  }
+
+  module.updateStat = function(job_id, type, state){
+    db.all("SELECT full_status FROM svift_queue WHERE job_id = ?", [job_id], function(err, rows){
+      if (err) {
+        console.log(err.message)
+      }
+      if(rows.length>=1){
+        var full_status = JSON.parse(rows[0].full_status)
+        if(!(type in full_status)){
+          full_status[type] = 0
+        }
+        full_status[type] = state
+
+        db.run("UPDATE svift_queue SET full_status = ? WHERE job_id = ?", [job_id, JSON.stringify(full_status)], function (err) {
+          if (err) {
+            console.log(err.message)
+          }
+        })
       }
     })
   }
