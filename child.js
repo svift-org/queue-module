@@ -36,6 +36,7 @@ var queue_child = (function () {
   }
 
   module.done = function () {
+    console.log('jobDone');
     process.send({func:'jobDone', params:{
       job_id :job_id,
       child_id:id
