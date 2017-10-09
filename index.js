@@ -106,7 +106,7 @@ var queue = (function () {
    })
   }
 
-  module.updateDone = function (params) {
+  module.jobUpdate = function (params) {
     module.updateStat(params.job_id, params.type, params.state)
   }
 
