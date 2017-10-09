@@ -14,7 +14,7 @@ var uuid = require('uuid/v1'),
 var queue = (function () {
  
   var module = {},
-  	db, children = [], childState = [], rootDir = null
+  	db, children = [], childState = [], rootDir = null, childStates = [], childJobs = []
 
   /**
   * Initiate the queue module, by providing an sqlite instance, afterwards a job table is initialised, which will hande the jobs
@@ -27,7 +27,7 @@ var queue = (function () {
   	db = mysqlite
 
     //Create job table if not already exists
-    db.run("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT, job_id text, status integer, full_status text, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
+    db.run("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
       if(err){
         //This creates an error if the svift_queue table is created for the first time, no worries about that...
         console.log(err)
@@ -36,6 +36,8 @@ var queue = (function () {
       for(let i = 0; i<cp_limit && i<numCPUs; i++){
         children.push(cp.fork(__dirname + '/child'))
         childState.push(-1)
+        childStates.push({})
+        childJobs.push(-1)
         children[i].send({func:'init', params:{id:i, dir:rootDir}})
         children[i].on('message', function(m) {
           module[m.func](m.params)
@@ -64,6 +66,8 @@ var queue = (function () {
         children.some( function (child, ci) {
           if(childState[ci] === 0){
             childState[ci] = 1
+            childJobs[ci] = rows[ri].job_id
+            childStates[ci] = {}
             db.run("UPDATE svift_queue SET status = 1, start = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [rows[ri].job_id], function (err) {
               if (err) {
                 console.log(err.message)
@@ -107,7 +111,7 @@ var queue = (function () {
   }
 
   module.jobUpdate = function (params) {
-    //module.updateStat(params.job_id, params.type, params.state)
+    module.updateStat(params.child_id, params.type, params.state)
   }
 
   module.jobDone = function (params) {
@@ -123,34 +127,28 @@ var queue = (function () {
   }
 
   module.jobStat = function (job_id, callback){
-    db.all("SELECT status, full_status FROM svift_queue WHERE job_id = ?", [job_id], function(err, rows){
+    db.all("SELECT status FROM svift_queue WHERE job_id = ?", [job_id], function(err, rows){
       if(rows.length<1){
         callback('job_id not found', null)
       }else{
-        callback(null, {status:rows[0].status, full:rows[0].full_status})
+        var r = {status:rows[0].status}
+        if(rows[0].status == 1){
+          childJobs.forEach(function(j, ji){
+            if(j == job_id){
+              r['full'] = childStates[ji]
+            }
+          })
+        }
+        callback(null, r)
       }
     })
   }
 
-  module.updateStat = function(job_id, type, state){
-    db.all("SELECT full_status FROM svift_queue WHERE job_id = ?", [job_id], function(err, rows){
-      if (err) {
-        console.log(err.message)
-      }
-      if(rows.length>=1){
-        var full_status = JSON.parse(rows[0].full_status)
-        if(!(type in full_status)){
-          full_status[type] = 0
-        }
-        full_status[type] = state
-
-        db.run("UPDATE svift_queue SET full_status = ? WHERE job_id = ?", [job_id, JSON.stringify(full_status)], function (err) {
-          if (err) {
-            console.log(err.message)
-          }
-        })
-      }
-    })
+  module.updateStat = function(child_id, type, state){
+    if(!(type in childStates[child_id])){
+      childStates[child_id][type] = 0
+    }
+    childStates[child_id][type] = state
   }
 
   module.stats = function ( callback ) {
