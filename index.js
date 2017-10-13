@@ -67,7 +67,8 @@ var queue = (function () {
           if(childState[ci] === 0){
             childState[ci] = 1
             childJobs[ci] = rows[ri].job_id
-            childStates[ci] = {}
+            //TODO: this object should be automatically generated through the available render methods??
+            childStates[ci] = {svg:0,html:0,png:0,gif:0,mpeg:0}
             db.run("UPDATE svift_queue SET status = 1, start = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [rows[ri].job_id], function (err) {
               if (err) {
                 console.log(err.message)
