@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/svift/queue-module.git"
+    "url": "https://github.com/svift-org/queue-module.git"
   },
   "author": "Sebastian Meier",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/svift/queue-module#readme",
+  "homepage": "https://github.com/svift-org/queue-module#readme",
   "dependencies": {
     "child_process": "^1.0.2",
     "os": "^0.1.1",
     "sqlite3": "^3.1.9",
-    "svift-render": "git+ssh://git@bitbucket.org/svift/render-module.git",
+    "svift-render": "git+https://git@github.com/svift-org/render-module.git",
     "uuid": "^3.1.0"
   }
 }
