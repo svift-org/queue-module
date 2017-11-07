@@ -19,7 +19,7 @@ var queue = (function () {
   /**
   * Initiate the queue module, by providing an sqlite instance, afterwards a job table is initialised, which will hande the jobs
   *
-  * @param {Object} `mysqlite` sqlite3 db object
+  * @param {Object} `mysqlite` postgres db object
   */
 
   module.init = function ( mysqlite, dir, callback ) {
@@ -27,7 +27,7 @@ var queue = (function () {
   	db = mysqlite
 
     //Create job table if not already exists
-    db.run("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
+    db.query("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
       if(err){
         //This creates an error if the svift_queue table is created for the first time, no worries about that...
         console.log(err)
@@ -44,6 +44,8 @@ var queue = (function () {
         })
       }
 
+      module.next()
+
       callback()
     })
   }
@@ -58,7 +60,8 @@ var queue = (function () {
   */
 
   module.next = function () {
-    db.all("SELECT job_id, params FROM svift_queue WHERE status = 0 ORDER BY start ASC", function(err, rows) {
+    db.query("SELECT job_id, params FROM svift_queue WHERE status = 0 ORDER BY start ASC", function(err, result) {
+      let rows = result.rows
       if(err){
         console.log(err)
       }else if ( rows && rows.length >= 1 ) {
@@ -69,7 +72,7 @@ var queue = (function () {
             childJobs[ci] = rows[ri].job_id
             //TODO: this object should be automatically generated through the available render methods??
             childStates[ci] = {svg:0,html:0,png:0,gif:0,mpeg:0}
-            db.run("UPDATE svift_queue SET status = 1, start = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [rows[ri].job_id], function (err) {
+            db.query("UPDATE svift_queue SET status = 1, start = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [rows[ri].job_id], function (err) {
               if (err) {
                 console.log(err.message)
               }
@@ -91,19 +94,19 @@ var queue = (function () {
 
   module.addJob = function (job_params, callback) {
 
-   db.run("INSERT INTO svift_queue (job_id, status, added, params) VALUES (?,?, strftime('%Y-%m-%d %H:%M:%S', 'now') ,?)", [uuid(), 0, JSON.stringify(job_params)], function (err) {
+   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES (?,?, strftime('%Y-%m-%d %H:%M:%S', 'now') ,?)", [uuid(), 0, JSON.stringify(job_params)], function (err) {
     if (err) {
       console.log(err.message)
     }
 
     let lastID = this.lastID
 
-    db.all("SELECT job_id FROM svift_queue WHERE id = ?", [lastID], function(err, rows){
+    db.query("SELECT job_id FROM svift_queue WHERE id = ?", [lastID], function(err, result){
       if(err){
         console.log(err.message)
       }
 
-      callback(rows[0].job_id)
+      callback(result.rows[0].job_id)
 
       module.next()
 
@@ -116,7 +119,7 @@ var queue = (function () {
   }
 
   module.jobDone = function (params) {
-    db.run("UPDATE svift_queue SET status = 2, end = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [params.job_id], function (err) {
+    db.query("UPDATE svift_queue SET status = 2, end = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [params.job_id], function (err) {
       if (err) {
         console.log(err.message)
       }
@@ -128,7 +131,8 @@ var queue = (function () {
   }
 
   module.jobStat = function (job_id, callback){
-    db.all("SELECT status FROM svift_queue WHERE job_id = ?", [job_id], function(err, rows){
+    db.query("SELECT status FROM svift_queue WHERE job_id = ?", [job_id], function(err, result){
+      let rows = result.rows
       if(rows.length<1){
         callback('job_id not found', null)
       }else{
@@ -153,12 +157,12 @@ var queue = (function () {
   }
 
   module.stats = function ( callback ) {
-    db.all("SELECT status, COUNT(*) FROM svift_queue GROUP BY status", function(err, rows) {
+    db.query("SELECT status, COUNT(*) FROM svift_queue GROUP BY status", function(err, result) {
       if (err) {
         console.log(err.message)
       }
 
-      callback(rows)
+      callback(result.rows)
     })
   }
 
