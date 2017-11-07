@@ -72,7 +72,7 @@ var queue = (function () {
             childJobs[ci] = rows[ri].job_id
             //TODO: this object should be automatically generated through the available render methods??
             childStates[ci] = {svg:0,html:0,png:0,gif:0,mpeg:0}
-            db.query("UPDATE svift_queue SET status = 1, start = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [rows[ri].job_id], function (err) {
+            db.query("UPDATE svift_queue SET status = 1, start = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = $1", [rows[ri].job_id], function (err) {
               if (err) {
                 console.log(err.message)
               }
@@ -94,14 +94,14 @@ var queue = (function () {
 
   module.addJob = function (job_params, callback) {
 
-   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES (?,?, strftime('%Y-%m-%d %H:%M:%S', 'now') ,?)", [uuid(), 0, JSON.stringify(job_params)], function (err) {
+   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES ($1,$2, strftime('%Y-%m-%d %H:%M:%S', 'now') ,$3)", [uuid(), 0, JSON.stringify(job_params)], function (err) {
     if (err) {
       console.log(err.message)
     }
 
     let lastID = this.lastID
 
-    db.query("SELECT job_id FROM svift_queue WHERE id = ?", [lastID], function(err, result){
+    db.query("SELECT job_id FROM svift_queue WHERE id = $1", [lastID], function(err, result){
       if(err){
         console.log(err.message)
       }
@@ -119,7 +119,7 @@ var queue = (function () {
   }
 
   module.jobDone = function (params) {
-    db.query("UPDATE svift_queue SET status = 2, end = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = ?", [params.job_id], function (err) {
+    db.query("UPDATE svift_queue SET status = 2, end = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = $1", [params.job_id], function (err) {
       if (err) {
         console.log(err.message)
       }
@@ -131,7 +131,7 @@ var queue = (function () {
   }
 
   module.jobStat = function (job_id, callback){
-    db.query("SELECT status FROM svift_queue WHERE job_id = ?", [job_id], function(err, result){
+    db.query("SELECT status FROM svift_queue WHERE job_id = $1", [job_id], function(err, result){
       let rows = result.rows
       if(rows.length<1){
         callback('job_id not found', null)
