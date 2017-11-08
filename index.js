@@ -28,7 +28,7 @@ var queue = (function () {
 
     //Create job table if not already exists
 
-    db.query("CREATE TABLE IF NOT EXISTS svift_queue (id SERIAL PRIMARY KEY, job_id text, status integer, added TIMESTAMP, start TIMESTAMP, end TIMESTAMP, params text)", function (err, result){
+    db.query("CREATE TABLE IF NOT EXISTS svift_queue (id SERIAL PRIMARY KEY, job_id text, status integer, added TIMESTAMP, start_time TIMESTAMP, end_time TIMESTAMP, params text)", function (err, result){
       if(err){
         //This creates an error if the svift_queue table is created for the first time, no worries about that...
         console.log(err)
@@ -61,7 +61,7 @@ var queue = (function () {
   */
 
   module.next = function () {
-    db.query("SELECT job_id, params FROM svift_queue WHERE status = 0 ORDER BY start ASC", function(err, result) {
+    db.query("SELECT job_id, params FROM svift_queue WHERE status = 0 ORDER BY start_time ASC", function(err, result) {
       let rows = result.rows
       if(err){
         console.log(err)
@@ -73,7 +73,7 @@ var queue = (function () {
             childJobs[ci] = rows[ri].job_id
             //TODO: this object should be automatically generated through the available render methods??
             childStates[ci] = {svg:0,html:0,png:0,gif:0,mpeg:0}
-            db.query("UPDATE svift_queue SET status = 1, start = NOW() WHERE job_id = $1", [rows[ri].job_id], function (err) {
+            db.query("UPDATE svift_queue SET status = 1, start_time = NOW() WHERE job_id = $1", [rows[ri].job_id], function (err) {
               if (err) {
                 console.log(err.message)
               }
@@ -120,7 +120,7 @@ var queue = (function () {
   }
 
   module.jobDone = function (params) {
-    db.query("UPDATE svift_queue SET status = 2, end = NOW() WHERE job_id = $1", [params.job_id], function (err) {
+    db.query("UPDATE svift_queue SET status = 2, end_time = NOW() WHERE job_id = $1", [params.job_id], function (err) {
       if (err) {
         console.log(err.message)
       }
