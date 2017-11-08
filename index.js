@@ -95,12 +95,12 @@ var queue = (function () {
 
   module.addJob = function (job_params, callback) {
 
-   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES ($1,$2, NOW() ,$3)", [uuid(), 0, JSON.stringify(job_params)], function (err) {
+   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES ($1,$2, NOW() ,$3)", [uuid(), 0, JSON.stringify(job_params)], function (err, result) {
     if (err) {
       console.log(err.message)
     }
 
-    let lastID = this.lastID
+    let lastID = result.rows[0].id
 
     db.query("SELECT job_id FROM svift_queue WHERE id = $1", [lastID], function(err, result){
       if(err){
