@@ -28,7 +28,7 @@ var queue = (function () {
 
     //Create job table if not already exists
 
-    db.query("CREATE TABLE IF NOT EXISTS svift_queue (id PRIMARY KEY SERIAL, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
+    db.query("CREATE TABLE IF NOT EXISTS svift_queue (id SERIAL PRIMARY KEY, job_id text, status integer, added TIMESTAMP, start TIMESTAMP, end TIMESTAMP, params text)", function (err, result){
       if(err){
         //This creates an error if the svift_queue table is created for the first time, no worries about that...
         console.log(err)
@@ -73,7 +73,7 @@ var queue = (function () {
             childJobs[ci] = rows[ri].job_id
             //TODO: this object should be automatically generated through the available render methods??
             childStates[ci] = {svg:0,html:0,png:0,gif:0,mpeg:0}
-            db.query("UPDATE svift_queue SET status = 1, start = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = $1", [rows[ri].job_id], function (err) {
+            db.query("UPDATE svift_queue SET status = 1, start = NOW() WHERE job_id = $1", [rows[ri].job_id], function (err) {
               if (err) {
                 console.log(err.message)
               }
@@ -95,7 +95,7 @@ var queue = (function () {
 
   module.addJob = function (job_params, callback) {
 
-   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES ($1,$2, strftime('%Y-%m-%d %H:%M:%S', 'now') ,$3)", [uuid(), 0, JSON.stringify(job_params)], function (err) {
+   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES ($1,$2, NOW() ,$3)", [uuid(), 0, JSON.stringify(job_params)], function (err) {
     if (err) {
       console.log(err.message)
     }
@@ -120,7 +120,7 @@ var queue = (function () {
   }
 
   module.jobDone = function (params) {
-    db.query("UPDATE svift_queue SET status = 2, end = strftime('%Y-%m-%d %H:%M:%S', 'now') WHERE job_id = $1", [params.job_id], function (err) {
+    db.query("UPDATE svift_queue SET status = 2, end = NOW() WHERE job_id = $1", [params.job_id], function (err) {
       if (err) {
         console.log(err.message)
       }
