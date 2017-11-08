@@ -28,7 +28,7 @@ var queue = (function () {
 
     //Create job table if not already exists
 
-    db.query("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTO_INCREMENT, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
+    db.query("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY SERIAL, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
       if(err){
         //This creates an error if the svift_queue table is created for the first time, no worries about that...
         console.log(err)
