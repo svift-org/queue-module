@@ -95,7 +95,7 @@ var queue = (function () {
 
   module.addJob = function (job_params, callback) {
 
-   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES ($1,$2, NOW() ,$3)", [uuid(), 0, JSON.stringify(job_params)], function (err, result) {
+   db.query("INSERT INTO svift_queue (job_id, status, added, params) VALUES ($1,$2, NOW() ,$3) RETURNING id", [uuid(), 0, JSON.stringify(job_params)], function (err, result) {
     if (err) {
       console.log(err.message)
     }
