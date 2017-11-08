@@ -100,6 +100,8 @@ var queue = (function () {
       console.log(err.message)
     }
 
+    console.log(result)
+
     let lastID = result.rows[0].id
 
     db.query("SELECT job_id FROM svift_queue WHERE id = $1", [lastID], function(err, result){
