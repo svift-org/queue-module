@@ -19,12 +19,12 @@ var queue = (function () {
   /**
   * Initiate the queue module, by providing an sqlite instance, afterwards a job table is initialised, which will hande the jobs
   *
-  * @param {Object} `mysqlite` postgres db object
+  * @param {Object} `postgres` postgres db object
   */
 
-  module.init = function ( mysqlite, dir, callback ) {
+  module.init = function ( postgres, dir, callback ) {
     rootDir = dir
-  	db = mysqlite
+  	db = postgres
 
     //Create job table if not already exists
     db.query("CREATE TABLE IF NOT EXISTS svift_queue (id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT, job_id text, status integer, added DATETIME, start DATETIME, end DATETIME, params text)", function (err, result){
