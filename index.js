@@ -107,6 +107,8 @@ var queue = (function () {
         console.log(err.message)
       }
 
+      console.log(result)
+
       callback(result.rows[0].job_id)
 
       module.next()
