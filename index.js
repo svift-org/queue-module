@@ -34,8 +34,8 @@ var queue = (function () {
         console.log(err)
       }
 
-      //TODO: UPDATE SET status = 0 WHERE status = 1
-      db.query("DELETE * FROM svift_queue", function (err, result){  
+      //TODO: DELETE * FROM svift_queue
+      db.query("UPDATE SET status = 0 WHERE status = 1", function (err, result){  
         if(err){
           console.log(err)
         }
@@ -52,7 +52,10 @@ var queue = (function () {
         }
 
         //Give the webserver time to start up
-        setTimeout(function(){module.next()}, 10000)
+        setTimeout(function(){
+          console.log('begin processing')
+          module.next()
+        }, 10000)
 
         callback()
       })
