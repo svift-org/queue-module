@@ -9,7 +9,7 @@
 var uuid = require('uuid/v1'),
   cp = require('child_process'),
   numCPUs = require('os').cpus().length,
-  cp_limit = 2
+  cp_limit = 8
 
 var queue = (function () {
  
