@@ -34,20 +34,24 @@ var queue = (function () {
         console.log(err)
       }
 
-      for(let i = 0; i<cp_limit && i<numCPUs; i++){
-        children.push(cp.fork(__dirname + '/child'))
-        childState.push(-1)
-        childStates.push({})
-        childJobs.push(-1)
-        children[i].send({func:'init', params:{id:i, dir:rootDir}})
-        children[i].on('message', function(m) {
-          module[m.func](m.params)
-        })
-      }
+      db.query("UPDATE SET status = 0 WHERE status = 1", function (err, result){  
 
-      module.next()
+        for(let i = 0; i<cp_limit && i<numCPUs; i++){
+          children.push(cp.fork(__dirname + '/child'))
+          childState.push(-1)
+          childStates.push({})
+          childJobs.push(-1)
+          children[i].send({func:'init', params:{id:i, dir:rootDir}})
+          children[i].on('message', function(m) {
+            module[m.func](m.params)
+          })
+        }
 
-      callback()
+        module.next()
+
+        callback()
+
+      })
     })
   }
 
