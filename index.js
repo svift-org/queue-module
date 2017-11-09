@@ -34,7 +34,11 @@ var queue = (function () {
         console.log(err)
       }
 
-      db.query("UPDATE SET status = 0 WHERE status = 1", function (err, result){  
+      //TODO: UPDATE SET status = 0 WHERE status = 1
+      db.query("DELETE * FROM svift_queue", function (err, result){  
+        if(err){
+          console.log(err)
+        }
 
         for(let i = 0; i<cp_limit && i<numCPUs; i++){
           children.push(cp.fork(__dirname + '/child'))
@@ -50,7 +54,6 @@ var queue = (function () {
         module.next()
 
         callback()
-
       })
     })
   }
