@@ -9,7 +9,7 @@
 var uuid = require('uuid/v1'),
   cp = require('child_process'),
   numCPUs = require('os').cpus().length,
-  cp_limit = 8
+  cpu_limit = 8
 
 var queue = (function () {
  
@@ -40,7 +40,9 @@ var queue = (function () {
           console.log(err)
         }
 
-        for(let i = 0; i<cp_limit && i<numCPUs; i++){
+        console.log('CPUs:', ((numCPUs>cpu_limit)?cpu_limit:numCPUs))
+
+        for(let i = 0; i<cpu_limit && i<numCPUs; i++){
           children.push(cp.fork(__dirname + '/child'))
           childState.push(-1)
           childStates.push({})
