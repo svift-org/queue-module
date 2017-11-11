@@ -35,7 +35,7 @@ var queue = (function () {
       }
 
       //TODO: DELETE * FROM svift_queue
-      db.query("UPDATE SET status = 0 WHERE status = 1", function (err, result){  
+      db.query("UPDATE svift_queue SET status = 0 WHERE status = 1", function (err, result){  
         if(err){
           console.log(err)
         }
