@@ -54,12 +54,6 @@ var queue = (function () {
           })
         }
 
-        //Give the webserver time to start up
-        setTimeout(function(){
-          console.log('begin processing')
-          module.next()
-        }, 10000)
-
         callback()
       })
     })
