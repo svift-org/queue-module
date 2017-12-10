@@ -18,7 +18,12 @@ var queue_child = (function () {
   module.process = process
 
   process.on('message', function(m) {
-    module[m.func](m.params)
+    console.log('message', m.func, m.params)
+    if(m.func in module){
+      module[m.func](m.params)  
+    }else{
+      console.log(m.func + 'not found')
+    }
   });
 
   module.init = function (obj) {
