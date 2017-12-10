@@ -18,7 +18,6 @@ var queue_child = (function () {
   module.process = process
 
   process.on('message', function(m) {
-    console.log('message', m.func, m.params)
     if(m.func in module){
       module[m.func](m.params)  
     }else{
