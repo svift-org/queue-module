@@ -80,7 +80,8 @@ var queue = (function () {
             childState[ci] = 1
             childJobs[ci] = rows[ri].job_id
             //TODO: this object should be automatically generated through the available render methods??
-            childStates[ci] = {svg:0,html:0,png:0,gif:0,mpeg:0}
+            //Video is being removed temporarily: ++{mpeg:0}
+            childStates[ci] = {svg:0,html:0,png:0,gif:0}
             db.query("UPDATE svift_queue SET status = 1, start_time = NOW() WHERE job_id = $1", [rows[ri].job_id], function (err) {
               if (err) {
                 console.log(err.message)
