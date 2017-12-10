@@ -61,7 +61,8 @@ var queue = (function () {
 
   module.initDone = function ( params ) {
     childState[params.child_id] = 0
-    setTimeout(module.next, 10000)
+    console.log('break')
+    setTimeout(module.next, 50000)
   }
 
   /**
