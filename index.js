@@ -9,7 +9,7 @@
 var uuid = require('uuid/v1'),
   cp = require('child_process'),
   numCPUs = require('os').cpus().length,
-  cpu_limit = 3
+  cpu_limit = 2
   //TODO: Test how many cpus we can max out before we get memory warnings on heroku, test difference between free and paid version 
 
 var queue = (function () {
